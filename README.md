@@ -19,7 +19,17 @@ Uygulama saatin RTC/Flash kayıtlarına yazmaz. Saat uygulamasına dönmek için
 
 ## Derleme ve yükleme
 
-Yanına `Smartwatch` adıyla [smart_watch](https://github.com/polite10/smart_watch) checkout'u gerekir. `sdk.lock.json` doğrulanmış sürümü belirtir. ST'nin sürücüleri, mevcut kart ekran adaptörü, LVGL ve NemaGFX o repodan kullanılır; saat ekranları/modelleri Düello'ya bağlanmaz.
+Yanına güncel [smart_watch](https://github.com/polite10/smart_watch) çalışma ağacı gerekir. `smart_watch-main`, `Smartwatch` ve `smart_watch` klasör adları otomatik aranır; farklı konum `--smartwatch-root` / `-SmartwatchRoot` ile verilir. SDK'nın güncel iki parametreli `device_runtime_init(app, handler)` DMA API'si ve `tools/device_build.py` yardımcısı kullanılır. `sdk.lock.json` temel commit/API bilgisidir; derleme yerel çalışma ağacını kullanır. ST'nin sürücüleri, mevcut kart ekran adaptörü, LVGL ve NemaGFX o repodan kullanılır; saat ekranları/modelleri Düello'ya bağlanmaz. Ekran/GPU adaptörleri yanında ortak UART yolunun `watch_led_commands` ayrıştırıcısı bağlanır.
+
+macOS'ta:
+
+```sh
+python3 build.py
+# SDK nesneleri güncelse:
+python3 build.py --skip-sdk-build
+```
+
+Windows'ta Python 3.12+ ve CubeIDE ile:
 
 ```powershell
 ./Build.ps1
@@ -36,3 +46,13 @@ python ../DeviceStudio/package_firmware.py Firmware/Duello.bin Firmware/Duello.d
 Runtime UART: **115200 8N1**. `REQ <seq> HELLO`, `STATUS`, `BOOT` veya tablo komutları newline ile gönderilir. JSON cevap aynı sıra numarası, uygulama kimliği, bootloader bilgisi ve durum taşır. LED telemetrisi ayrı satırlardır; istemci bunları filtreler. Runtime parser sınırlı bir RX ring buffer kullanır; taşmış satırı komut olarak çalıştırmaz.
 
 Gerçek kart testi: silahı çıkarma, ateş, meşgul eylem reddi, doldurma, yerine koyma, bağlantı zaman aşımı, reset ve Smartwatch'a dönüş; sonuçlar Device Studio'nun `hardware-report.json` dosyasındadır.
+
+Derlemeler SDK kaynak ağacını taşımadan ortak ARM GCC yolunu kullanır. `ARM_GCC_BIN` ile araç dizini, Windows'ta `-IdeRoot` ile CubeIDE dizini seçilebilir. `--skip-sdk-build` yalnız bu kaynak sürümüyle eşleşen güncel SDK nesneleri için kullanılmalıdır; varsayılan derleme SDK'yı önce günceller.
+
+Yerel runtime doğrulaması:
+
+```sh
+python3 tests/verify_runtime.py
+```
+
+`unicorn` ve `pyelftools` gerekir. Sonuç `build/verification-local.json` içindedir; gerçek karta erişilmez. Önceki `verification.json` / Studio `hardware-report.json` yeni derlemenin donanım testi değildir.

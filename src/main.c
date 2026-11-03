@@ -16,7 +16,7 @@ int main(void){
     smartwatch_status=1;HAL_Init();SystemClock_Config();
     if(HAL_ICACHE_WaitForInvalidateComplete()!=HAL_OK || HAL_ICACHE_Enable()!=HAL_OK)Error_Handler();
     BSP_LED_Init(LED_RED);watch_platform_display_init();duello_scene_init();
-    led_button_demo_init();device_runtime_init(&led_demo_uart,"Duello",duello_command);smartwatch_status=4;
+    led_button_demo_init();device_runtime_init("Duello",duello_command);smartwatch_status=4;
     while(1){led_button_demo_poll();device_runtime_poll();watch_platform_display_poll();lv_timer_handler();++smartwatch_heartbeat;HAL_Delay(1);}
 }
 void Error_Handler(void){smartwatch_status|=0x80000000;while(1){BSP_LED_Toggle(LED_RED);HAL_Delay(200);}}
